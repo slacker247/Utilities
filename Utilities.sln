@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities.csproj", "{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Mgmt Release|Any CPU = Mgmt Release|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Test Local|Any CPU = Test Local|Any CPU
+		Test Remote|Any CPU = Test Remote|Any CPU
+		WebShowInfo Release|Any CPU = WebShowInfo Release|Any CPU
+		Website Test Remote|Any CPU = Website Test Remote|Any CPU
+		Website Test|Any CPU = Website Test|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Mgmt Release|Any CPU.ActiveCfg = Mgmt Release|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Mgmt Release|Any CPU.Build.0 = Mgmt Release|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Test Local|Any CPU.ActiveCfg = Test Local|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Test Local|Any CPU.Build.0 = Test Local|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Test Remote|Any CPU.ActiveCfg = Test Remote|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Test Remote|Any CPU.Build.0 = Test Remote|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.WebShowInfo Release|Any CPU.ActiveCfg = WebShowInfo Release|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.WebShowInfo Release|Any CPU.Build.0 = WebShowInfo Release|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test Remote|Any CPU.ActiveCfg = Website Test Remote|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test Remote|Any CPU.Build.0 = Website Test Remote|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test|Any CPU.ActiveCfg = Website Test|Any CPU
+		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test|Any CPU.Build.0 = Website Test|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
