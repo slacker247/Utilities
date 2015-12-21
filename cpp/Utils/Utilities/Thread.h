@@ -19,8 +19,8 @@ namespace utilities
 	class UtilAPI Thread
 	{
 	public:
-		Thread(void* (CDECL *func)(void));
-		Thread(void (CDECL  *func)(void *), void* classPtr);
+		Thread(void*( UtilAPI *func )( void ));
+		Thread(void*( UtilAPI *func )( void * ), void* classPtr);
 		~Thread(void);
 		
 		static void sleep(long ms);
@@ -33,7 +33,7 @@ namespace utilities
 		bool isAlive();
 		void* m_ExeFunc;
 	protected:
-		static void CDECL run(void * param);
+		static void* UtilAPI run(void * param);
 
 		/////////////////////////////////////////////////////////
 		/// Variable: m_ThreadID
@@ -41,7 +41,7 @@ namespace utilities
 		/// <summary>The id to manage this thread.</summary>
 		/////////////////////////////////////////////////////////
 		unsigned long m_ThreadID;
-		String m_Name;
+                String m_Name;
 		/////////////////////////////////////////////////////////
 		/// Variable: m_ThreadHandle
 		///

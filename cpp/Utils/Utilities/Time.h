@@ -3,7 +3,6 @@
 #else
 #include <sys/time.h>
 #include <ctime>
-#include <unistd.h>
 #endif
 
 #include "dllMain.h"
@@ -25,6 +24,5 @@ namespace utilities
 
 		static INT64 getTimeMs64();
 		static String toString(INT64 inTime);
-		static void sleep(int ms);
 	};
 }

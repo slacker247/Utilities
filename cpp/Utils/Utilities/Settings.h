@@ -5,7 +5,7 @@
 #include <fstream>
 
 #include "dllMain.h"
-//#include "Logging/Logger.h"
+#include "Logging/Logger.h"
 #include "Util.h"
 
 using namespace std;

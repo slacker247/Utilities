@@ -3,59 +3,56 @@
 
 namespace utilities
 {
-
 	// NOT THREAD SAFE!!!
-	UtilAPI String newString(const char* s)
+	String newString(const char* s)
 	{
 		String ws;
-#ifdef _UNICODE
+#ifdef WIN32
 		int length = std::strlen(s);
-		if (length > 0)
+		if(length > 0)
 		{
-			wchar_t* buf = new wchar_t[length];
-			size_t num_chars = mbstowcs(buf, s, length);
-			ws.assign(buf, num_chars);
+			wchar_t* buf = new wchar_t[ length ];
+			size_t num_chars = mbstowcs( buf, s, length );
+			ws.assign( buf, num_chars );
 			delete buf;
 		}
 		else
 			ws.assign(L"");
 #else
-		ws.append(s);
+                ws.append(s);
 #endif
 		return ws;
 	}
 
-	UtilAPI int cmpStrI(const String& stringA, const String& stringB)
+	int cmpStrI(const String& stringA , const String& stringB)
 	{
 		int status = 0;
-#ifdef _UNICODE
+#ifdef WIN32
 		status = _wcsicmp(stringA.c_str(), stringB.c_str());
 #else
-		status = std::strcmp(stringA.c_str(), stringB.c_str());
+                status = std::strcmp(stringA.c_str(), stringB.c_str());
 #endif
 		return status;
 	}
 
-	UtilAPI double strToDbl(const String& value)
+	double strToDbl(const String& value)
 	{
 		double retVal = 0;
 		try
 		{
 #if (__cplusplus > 199711L)
 			retVal = std::stod(value);
-#elif _UNICODE
-			retVal = _wtof(value.c_str());
 #else
 			retVal = atof(value.c_str());
 #endif
 		}
-		catch (...)
+		catch(...)
 		{
 		}
 		return retVal;
 	}
 
-	UtilAPI String dblToStr(double value)
+	String dblToStr(double value)
 	{
 		String retVal = newString("");
 		try
@@ -65,7 +62,7 @@ namespace utilities
 			sprintf(buf, "%f", value);
 			retVal = newString(buf);
 		}
-		catch (...)
+		catch(...)
 		{
 		}
 		return retVal;
@@ -73,19 +70,19 @@ namespace utilities
 
 	const String WHITESPACE = newString(" \n\r\t");
 
-	UtilAPI String strTrim(const String& s)
+	String strTrim(const String& s)
 	{
 		String retVal;
 		bool test = false;
-		for (int i = 0; i < WHITESPACE.length(); i++)
+		for(int i = 0; i < WHITESPACE.length(); i++)
 		{
-			if (s.find(WHITESPACE[i]) != String::npos)
+			if(s.find(WHITESPACE[i]) != String::npos)
 			{
 				test = true;
 				i = 10;
 			}
 		}
-		if (test)
+		if(test)
 		{
 			retVal = strTrimLeft(s);
 			retVal = strTrimRight(retVal);
@@ -95,11 +92,11 @@ namespace utilities
 		return retVal;
 	}
 
-	UtilAPI String strTrimLeft(const String& s)
+	String strTrimLeft(const String& s)
 	{
 		String retVal;
 		size_t startpos = s.find_first_not_of(WHITESPACE);
-		if (startpos != String::npos)
+		if(startpos != String::npos)
 		{
 			retVal = s.substr(startpos);
 		}
@@ -110,13 +107,13 @@ namespace utilities
 		return retVal;
 	}
 
-	UtilAPI String strTrimRight(const String& s)
+	String strTrimRight(const String& s)
 	{
 		String retVal;
 		size_t endpos = s.find_last_not_of(WHITESPACE);
-		if (endpos != String::npos)
+		if(endpos != String::npos)
 		{
-			retVal = s.substr(0, endpos + 1);
+			retVal = s.substr(0, endpos+1);
 		}
 		else
 		{
@@ -124,8 +121,7 @@ namespace utilities
 		}
 		return retVal;
 	}
-
-	// http://www.cse.yorku.ca/~oz/hash.html
+        
 	UtilAPI unsigned long hash(unsigned char *str)
 	{
 		unsigned long l_Hash = 5381;

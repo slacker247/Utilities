@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "dllMain.h"
-//#include <Logging/Logger.h>
+#include <Logging/Logger.h>
 
 #if defined WIN32
 	#include <xerces-c-3.1.1/src/xercesc/util/PlatformUtils.hpp>

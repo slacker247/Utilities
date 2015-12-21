@@ -176,7 +176,6 @@ namespace utilities
 	/// <returns>returns: 0 for a success. Otherwise the
 	/// value will be in the lookup table: <see></see> </returns>
 	/////////////////////////////////////////////////////////
-	/* TODO : Move to the right location (static function in AnyOptions)
 	int Util::parseArgs(int argc, char* argv[], char*& fileName)
 	{
 		int status = -1;
@@ -197,7 +196,7 @@ namespace utilities
 		opt->processCommandArgs( argc, argv );
 
 		// Check args
-		 /* print usage if no options /
+		 /* print usage if no options */
 		bool opts = opt->hasOptions();
 		bool help = opt->getFlag("help");
 		bool help2 = opt->getFlag('h');
@@ -220,5 +219,5 @@ namespace utilities
 
 		delete opt;
 		return status;
-	}*/
+	}
 }

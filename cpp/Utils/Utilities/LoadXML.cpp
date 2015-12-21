@@ -68,7 +68,7 @@ namespace utilities
 			char* message = xercesc::XMLString::transcode(toCatch.getMessage());
 			char* msg = new char[256];
 			sprintf(msg, "Exception message is: \n%s\n", message);
-			//Logger::log(msg, Logger::DEBUGINFO);
+			Logger::log(msg, Logger::DEBUGINFO);
 			xercesc::XMLString::release(&message);
 		}
 		catch (const xercesc::DOMException& toCatch)
@@ -76,7 +76,7 @@ namespace utilities
 			char* message = xercesc::XMLString::transcode(toCatch.msg);
 			char* msg = new char[256];
 			sprintf(msg, "Exception message is: \n%s\n", message);
-			//Logger::log(msg, Logger::DEBUGINFO);
+			Logger::log(msg, Logger::DEBUGINFO);
 			xercesc::XMLString::release(&message);
 		}
 		catch(xercesc::RuntimeException toCatch)
@@ -84,12 +84,12 @@ namespace utilities
 			char* message = xercesc::XMLString::transcode(toCatch.getMessage());
 			char* msg = new char[256];
 			sprintf(msg, "Exception message is: \n%s\n", message);
-			//Logger::log(msg, Logger::DEBUGINFO);
+			Logger::log(msg, Logger::DEBUGINFO);
 			xercesc::XMLString::release(&message);
 		}
 		catch (...)
 		{
-			//Logger::log("Unexpected Exception \n", Logger::DEBUGINFO);
+			Logger::log("Unexpected Exception \n", Logger::DEBUGINFO);
 		}
 
 		delete parser;

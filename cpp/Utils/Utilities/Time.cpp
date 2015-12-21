@@ -15,15 +15,6 @@ namespace utilities
 	{
 	}
 
-	void Time::sleep(int ms)
-	{
-#ifdef __linux__
-		usleep(ms * 1000);
-#else
-		Sleep(ms);
-#endif
-	}
-
 	INT64 Time::getTimeMs64()
 	{
 	#ifdef WIN32

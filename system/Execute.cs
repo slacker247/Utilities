@@ -5,23 +5,115 @@ using System.Text;
 using System.ComponentModel;
 using System.Threading;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Utilities.system
 {
     public class Execute
     {
+        public static bool g_Async = false;
         public static bool g_CreateNoWindow = true;
+        protected static System.Diagnostics.Process g_Proc = null;
 
         public delegate void ReceivedDataCallback(String data);
         public static event ReceivedDataCallback receivedDataEvent;
 
         private static void receivedData(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            System.Console.WriteLine("Data received: " + outLine.Data);
+            if (sendingProcess is Process)
+                receivedData((Process)sendingProcess, outLine.Data);
+        }
 
-            if (receivedDataEvent != null && !String.IsNullOrEmpty(outLine.Data))
+        protected static void receivedData(Process proc, String data)
+        {
+            //System.Console.WriteLine("Data received: " + data);
+
+            if (receivedDataEvent != null && !String.IsNullOrEmpty(data))
             {
-                receivedDataEvent(outLine.Data);
+                receivedDataEvent(data);
+            }
+        }
+
+        public static void writeData(String cmd, String args)
+        {
+            writeData(cmd + " " + args);
+        }
+
+        public static void writeData(String cmd)
+        {
+            if(g_Proc != null &&
+                !g_Proc.HasExited)
+            {
+                TimeSpan timeout = new TimeSpan(0, 0, 15);
+                g_Proc.StandardInput.WriteLine(cmd);
+
+                char[] buf = new char[1024];
+                String response = "";
+                int bufLength = 1;
+                bool foundCmd = false;
+                DateTime start = DateTime.Now;
+                while (!foundCmd &&
+                    (DateTime.Now - start) < timeout)
+                {
+                    if (g_Proc != null)
+                    {
+                        if (bufLength > 0)
+                        {
+                            Thread th = new Thread(() =>
+                                { bufLength = g_Proc.StandardOutput.Read(buf, 0, 1023); });
+                            th.Start();
+                            if (!th.Join(TimeSpan.FromSeconds(15)))
+                            {
+                                bufLength = 0;
+                                th.Abort();
+                            }
+
+                            g_Proc.StandardOutput.DiscardBufferedData();
+                            response = new String(buf).TrimEnd('\0');
+                            List<String> lines = new List<string>();
+                            lines.AddRange(response.Split('\n'));
+                            Array.Clear(buf, 0, 1024);
+                            foreach (String line in lines)
+                            {
+                                if (line.Contains(cmd))
+                                    foundCmd = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foundCmd = true;
+                    }
+                }
+                start = DateTime.Now;
+                while (g_Proc != null &&
+                    bufLength > 0 &&
+                    !(response.Trim().EndsWith(">")) &&
+                    (DateTime.Now - start) < timeout
+                )
+                {
+                    if (g_Proc != null &&
+                        bufLength > 0)
+                    {
+                        Thread th = new Thread(() =>
+                        { bufLength = g_Proc.StandardOutput.Read(buf, 0, 1023); });
+                        th.Start();
+                        if (!th.Join(TimeSpan.FromSeconds(15)))
+                        {
+                            bufLength = 0;
+                            th.Abort();
+                        }
+
+                        g_Proc.StandardOutput.DiscardBufferedData();
+                        response += new String(buf).TrimEnd('\0');
+                        Array.Clear(buf, 0, 1024);
+                    }
+                    else
+                        bufLength = 0;
+                }
+                receivedData(g_Proc, response);
+                if(g_Proc != null)
+                    g_Proc.StandardOutput.DiscardBufferedData();
             }
         }
 
@@ -40,6 +132,7 @@ namespace Utilities.system
                 {
                     exitedEvent(proc.ExitCode);
                 }
+                g_Proc = null;
             }
         }
 
@@ -95,7 +188,7 @@ namespace Utilities.system
                 // Do not create the black window.
                 procStartInfo.CreateNoWindow = g_CreateNoWindow;
                 // Now we create a process, assign its ProcessStartInfo and start it
-                System.Diagnostics.Process g_Proc = new System.Diagnostics.Process();
+                g_Proc = new System.Diagnostics.Process();
                 g_Proc.StartInfo = procStartInfo;
 
                 if (receivedDataEvent != null ||
@@ -112,7 +205,7 @@ namespace Utilities.system
                     System.Console.WriteLine("Starting command.");
                     if (g_Proc.Start())
                         result = "Executing Command...";
-                    while (!g_Proc.HasExited)
+                    while (!g_Proc.HasExited && !g_Async)
                         Thread.Sleep(120);
                     result = "Finished.";
                 }
@@ -139,6 +232,8 @@ namespace Utilities.system
                 System.Console.WriteLine("Result: " + result);
                 //System.Console.ReadKey();
             }
+            if(!g_Async)
+                g_Proc = null;
             return status;
         }
     }

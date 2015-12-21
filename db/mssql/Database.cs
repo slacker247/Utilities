@@ -6,18 +6,13 @@ using System.Data;
 using System.Threading;
 using System.Data.SqlTypes;
 
-namespace Utilities.db
+namespace Utilities.db.mssql
 {
-    public class Database
+    public class Database : DBServer
     {
         protected SqlConnection m_Conn;
         protected SqlCommand m_Cmd;
         protected SqlDataReader m_Reader;
-        protected String m_Database = "Media";
-        protected String m_Server = "192.168.0.11";
-        protected String m_User = "webuser";
-        protected String m_Password = "pass";
-        protected bool m_PersistSecurityInfo = true;
 
         protected String m_TableName = "Object";
 
@@ -166,6 +161,7 @@ namespace Utilities.db
             return status;
         }
 
+        [Obsolete("Use get by prop")]
         public Object getById(long id)
         {
             Object data = null;

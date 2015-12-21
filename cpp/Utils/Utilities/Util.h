@@ -2,7 +2,7 @@
 
 #include "dllMain.h"
 
-//#include "Options/anyoption.h"
+#include "Options/anyoption.h"
 #include <sys/stat.h> 
 #include <cstring>
 #include <string>

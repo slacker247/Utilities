@@ -227,5 +227,17 @@ namespace Utilities
             // error occured, return false
             return false;
         }
+
+        public static String replaceInvalidFileChars(String name)
+        {
+            string illegal = new String(name.ToCharArray());
+            string invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+
+            foreach (char c in invalid)
+            {
+                illegal = illegal.Replace(c.ToString(), "");
+            }
+            return illegal;
+        }
     }
 }

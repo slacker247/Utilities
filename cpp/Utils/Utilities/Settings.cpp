@@ -28,7 +28,7 @@ namespace utilities
 	/////////////////////////////////////////////////////////
 	int Settings::parseSettings(const char* fileName)
 	{
-		//Logger::log("Parsing settings...\n", Logger::DEBUGINFO);
+		Logger::log("Parsing settings...\n", Logger::DEBUGINFO);
 		int status = -1;
 		string line;
 		ifstream file(fileName);
@@ -62,7 +62,7 @@ namespace utilities
 		else
 			// TODO : insert proper error code.
 			status = -1;
-		//Logger::log("Parsed settings.\n", Logger::DEBUGINFO);
+		Logger::log("Parsed settings.\n", Logger::DEBUGINFO);
 		return status;
 	}
 

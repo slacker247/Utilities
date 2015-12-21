@@ -10,7 +10,12 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Threading;
 using System.Globalization;
+using System.Xml;
+#if !SILVERLIGHT
 using IWshRuntimeLibrary;
+#else
+using System.Xml.Linq;
+#endif
 
 namespace Utilities
 {
@@ -22,7 +27,49 @@ namespace Utilities
         public const bool Debug = false;
 #endif
         protected static int m_LastMonth = 1;
+#if !SILVERLIGHT
         protected static ArrayList m_Files = new ArrayList();
+#else
+        protected static List<String> m_Files = new List<String>();
+#endif
+
+        public static
+#if !SILVERLIGHT
+            XmlDocument
+#else
+            XDocument
+#endif
+            getXml(String xml)
+        {
+            // Encode the XML string in a UTF-8 byte array
+            byte[] encodedString = Encoding.UTF8.GetBytes(xml);
+            // Put the byte array into a stream and rewind it to the beginning
+            MemoryStream ms = new MemoryStream(encodedString);
+            ms.Flush();
+            ms.Position = 0; 
+#if !SILVERLIGHT
+            XmlTextReader textReader = new XmlTextReader(ms);
+            XmlDocument doc = new XmlDocument();
+#else
+            XmlReader textReader = XmlReader.Create(ms);
+            XDocument doc = null;
+#endif
+            bool test = false;
+            try
+            {
+#if !SILVERLIGHT
+                doc.Load(textReader);
+#else
+                doc = XDocument.Load(textReader);
+#endif
+                test = true;
+            }
+            catch (System.Xml.XmlException ex)
+            {
+                System.Console.WriteLine("Util.getXml: Failed to load the Xml.\n");
+            }
+            return doc;
+        }
 
         public static bool validateEmail(String email)
         {
@@ -43,6 +90,7 @@ namespace Utilities
             return test;
         }
 
+#if !SILVERLIGHT
         public static void createShortcut(String pathToExe, String pathToSave, String args = "", String shortcutName = "", String description = "")
         {
             FileInfo exe = null;
@@ -86,6 +134,7 @@ namespace Utilities
             String html = HTMLFormatting.includeJS(file);
             return html;
         }
+#endif
 
         /// <summary>
         /// 
@@ -127,6 +176,7 @@ namespace Utilities
             return hash;
         }
 
+#if !SILVERLIGHT
         // TODO : Move to FileIO
         public static String fileHash(String file)
         {
@@ -268,7 +318,7 @@ namespace Utilities
             // error occured, return false
             return false;
         }
-
+#endif
         public static bool validateUrl(String url)
         {
             bool status = false;
@@ -277,8 +327,13 @@ namespace Utilities
                 try
                 {
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+#if !SILVERLIGHT
                     request.Proxy = null;
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+#else
+                    //https://msdn.microsoft.com/en-us/library/system.net.httpwebrequest.begingetresponse%28v=vs.110%29.aspx
+//                    HttpWebResponse response = (HttpWebResponse)request.BeginGetResponse();
+#endif
                     status = true;
                 }
                 catch { }
@@ -1129,6 +1184,7 @@ namespace Utilities
             return result;
         }
 
+#if !SILVERLIGHT
         public static int removeBadChars(ref String file)
         {
             int status = -1;
@@ -1150,6 +1206,7 @@ namespace Utilities
                 file = Regex.Replace(file, "//filedbsrv/media", "/Media/", RegexOptions.IgnoreCase);
                 file = Regex.Replace(file, "y:/", "/Media/", RegexOptions.IgnoreCase);
                 file = Regex.Replace(file, "//filedbsrv.j-a-m.net/media", "/Media/", RegexOptions.IgnoreCase);
+                file = Regex.Replace(file, "file:////", "/", RegexOptions.IgnoreCase);
                 status = 0;
             }
             return status;
@@ -1263,10 +1320,10 @@ namespace Utilities
         }
 
         // TODO : Move to FileIO
-        protected static bool IsFileLocked(FileInfo file)
+        public static bool IsFileLocked(FileInfo file)
         {
             FileStream stream = null;
-
+            bool test = false;
             try
             {
                 stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
@@ -1277,7 +1334,7 @@ namespace Utilities
                 //still being written to
                 //or being processed by another thread
                 //or does not exist (has already been processed)
-                return true;
+                test = true;
             }
             finally
             {
@@ -1286,9 +1343,9 @@ namespace Utilities
             }
 
             //file is not locked
-            return false;
+            return test;
         }
-
+#endif
         public static byte[] hexStringToByteArray(string hexString)
         {
             if (hexString.Length % 2 != 0)
@@ -1307,7 +1364,7 @@ namespace Utilities
         }
 
 
-
+#if !SILVERLIGHT
         /// <summary>
         /// The function determines whether the current operating system is a 
         /// 64-bit operating system.
@@ -1351,5 +1408,6 @@ namespace Utilities
             }
             return (PInvoke.desktop.Kernel32.GetProcAddress(moduleHandle, methodName) != IntPtr.Zero);
         }
+#endif
     }
 }

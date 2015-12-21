@@ -2,7 +2,7 @@
 
 namespace utilities
 {
-	Thread::Thread(void* (CDECL *func)(void))
+	Thread::Thread(void*( UtilAPI *func )( void ))
 	{
             m_ExeFunc = (void*)func;
 #ifdef WIN32
@@ -16,7 +16,7 @@ namespace utilities
 #endif
 	}
 	
-	Thread::Thread(void (CDECL *func)(void *), void* classPtr)
+	Thread::Thread(void*( UtilAPI *func )( void * ), void* classPtr)
 	{
             m_ExeFunc = (void*)func;
 #ifdef WIN32
@@ -57,12 +57,13 @@ namespace utilities
 	///
 	/// <returns>returns: nothing </returns>
 	/////////////////////////////////////////////////////////
-	void CDECL Thread::run(void * param)
+	void* UtilAPI Thread::run(void * param)
 	{
             //*(((Thread)param).m_ExeFunc)();
 
             //while(m_Suspend)
             //  pthread_cond_wait(this->m_ResumeCond, this->m_MutexHandle);
+            return NULL;
 	}
 
 	/////////////////////////////////////////////////////////

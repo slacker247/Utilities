@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace Utilities.db
+namespace Utilities
 {
     public abstract class BaseToXmlObject : Object
     {
