@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 
 
-namespace Utilities
+namespace Utilities.db
 {
 	public class Object : IComparable
 	{

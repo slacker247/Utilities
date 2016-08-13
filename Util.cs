@@ -395,6 +395,33 @@ namespace Utilities
             return result;
         }
 
+        public static bool isNumber(object num)
+        {
+            bool test = false;
+            if (num is int ||
+                num is uint ||
+                num is float ||
+                num is double ||
+                num is short ||
+                num is ushort ||
+                num is long ||
+                num is ulong)
+            {
+                test = true;
+            }
+            return test;
+        }
+
+        public static double toNumber(object num)
+        {
+            double retVal = 0;
+            if (isNumber(num))
+                retVal = (double)num;
+            else if (num is String)
+                double.TryParse((String)num, out retVal);
+            return retVal;
+        }
+
         // TODO : Move to FileIO
         public static bool checkExt(String ext)
         {

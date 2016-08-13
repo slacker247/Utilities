@@ -68,15 +68,18 @@ namespace Utilities.system
                                 th.Abort();
                             }
 
-                            g_Proc.StandardOutput.DiscardBufferedData();
-                            response = new String(buf).TrimEnd('\0');
-                            List<String> lines = new List<string>();
-                            lines.AddRange(response.Split('\n'));
-                            Array.Clear(buf, 0, 1024);
-                            foreach (String line in lines)
+                            if (g_Proc != null)
                             {
-                                if (line.Contains(cmd))
-                                    foundCmd = true;
+                                g_Proc.StandardOutput.DiscardBufferedData();
+                                response = new String(buf).TrimEnd('\0');
+                                List<String> lines = new List<string>();
+                                lines.AddRange(response.Split('\n'));
+                                Array.Clear(buf, 0, 1024);
+                                foreach (String line in lines)
+                                {
+                                    if (line.Contains(cmd))
+                                        foundCmd = true;
+                                }
                             }
                         }
                     }
@@ -96,7 +99,8 @@ namespace Utilities.system
                         bufLength > 0)
                     {
                         Thread th = new Thread(() =>
-                        { bufLength = g_Proc.StandardOutput.Read(buf, 0, 1023); });
+                        { if(g_Proc != null)
+                            bufLength = g_Proc.StandardOutput.Read(buf, 0, 1023); });
                         th.Start();
                         if (!th.Join(TimeSpan.FromSeconds(15)))
                         {
@@ -104,9 +108,12 @@ namespace Utilities.system
                             th.Abort();
                         }
 
-                        g_Proc.StandardOutput.DiscardBufferedData();
-                        response += new String(buf).TrimEnd('\0');
-                        Array.Clear(buf, 0, 1024);
+                        if (g_Proc != null)
+                        {
+                            g_Proc.StandardOutput.DiscardBufferedData();
+                            response += new String(buf).TrimEnd('\0');
+                            Array.Clear(buf, 0, 1024);
+                        }
                     }
                     else
                         bufLength = 0;
@@ -125,7 +132,8 @@ namespace Utilities.system
             Process proc = (Process)sendingProcess;
             if (proc != null && proc.HasExited)
             {
-                Console.WriteLine(proc.StandardOutput.ReadToEnd());
+                // This is for webcam, test webcam if changing.
+                receivedData(proc, proc.StandardOutput.ReadToEnd());
                 Console.WriteLine("Exit time:    {0}\r\n" +
                     "Exit code:    {1}\r\nElapsed time: {2}", proc.ExitTime, proc.ExitCode, 3325);
                 if (exitedEvent != null)
@@ -144,6 +152,16 @@ namespace Utilities.system
             g_UserName = username;
             g_Password = password;
             g_Domain = domain;
+        }
+
+        public static int terminate()
+        {
+            int status = -1;
+            if(g_Proc != null)
+            {
+                g_Proc.Kill();
+            }
+            return status;
         }
         
         public static int runCmd(String cmd, String args = "", String workingDir = "")
@@ -205,18 +223,26 @@ namespace Utilities.system
                     System.Console.WriteLine("Starting command.");
                     if (g_Proc.Start())
                         result = "Executing Command...";
-                    while (!g_Proc.HasExited && !g_Async)
+                    while (g_Proc != null && !g_Proc.HasExited && !g_Async)
                         Thread.Sleep(120);
                     result = "Finished.";
                 }
                 catch (Win32Exception e)
                 {
-                    result = "Error:" + e.Message;
+                    result = "EXE Error: " + e.Message;
+                    result += "\n" + e.StackTrace;
+                    result += "\n" + cmd;
+                    result += "\n" + args;
+                    result += "\n" + workingDir;
                     //g_Stop = true;
                 }
                 catch (Exception ex)
                 {
-                    result = "Error:" + ex.Message;
+                    result = "EXE Error: " + ex.Message;
+                    result += "\n" + ex.StackTrace;
+                    result += "\n" + cmd;
+                    result += "\n" + args;
+                    result += "\n" + workingDir;
                     //g_Stop = true;
                 }
                 try

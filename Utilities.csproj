@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Utilities</RootNamespace>
     <AssemblyName>Utilities</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -354,10 +354,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Net" />
     <Reference Include="System.Web" />
@@ -383,14 +385,17 @@
     <Compile Include="FingerPrint.cs" />
     <Compile Include="Hash.cs" />
     <Compile Include="HTMLFormatting.cs" />
+    <Compile Include="ImageProcess.cs" />
     <Compile Include="Impersonate.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="OAuth.cs" />
     <Compile Include="db\Object.cs" />
     <Compile Include="PostSubmitter.cs" />
+    <Compile Include="Reflection.cs" />
     <Compile Include="Send2Wnd.cs" />
     <Compile Include="SerialKey.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="StringEx.cs" />
     <Compile Include="system\Execute.cs" />
     <Compile Include="system\SystemResources.cs" />
     <Compile Include="threading\BaseWorker.cs" />
