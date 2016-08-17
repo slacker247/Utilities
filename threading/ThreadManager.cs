@@ -8,7 +8,7 @@ using System.Collections;
 
 
 namespace Utilities.threading
-{
+{ 
 	/// <summary>
 	/// This class handles all thread creation, scheduling, and callbacks for the 
 	/// collection process. In Addition, this class causes updates to the user's 
@@ -121,6 +121,7 @@ namespace Utilities.threading
             DateTime idleTime = DateTime.Now;
             while (m_Run)
 			{
+                int completedThreads = 0;
                 // Pause all requested cancel threads
                 for (int i = 0; i < m_CancelThreads.Keys.Count; i++ )
                 {
@@ -194,8 +195,8 @@ namespace Utilities.threading
                 if (totalThreadCount == 0 && oneTime)
                 {
                     Console.WriteLine("\nIdle...");
-                    if (mainProc.HandleCount > 2000)
-                        Environment.FailFast("Releasing Resources");
+                    //if (mainProc.HandleCount > 2000)
+                    //    Environment.FailFast("Releasing Resources");
                     oneTime = false;
                 }
 
@@ -225,8 +226,9 @@ namespace Utilities.threading
                         {
                             //m_DeadThreads[i] = null;
                             m_DeadThreads.RemoveAt(i);
-                            Console.Write(".");
+                            //Console.Write(".");
                             i--;
+                            completedThreads++;
                         }
                     }
                     count = 0;
@@ -234,11 +236,14 @@ namespace Utilities.threading
                     GC.WaitForPendingFinalizers();
 //#if DEBUG
                     Console.WriteLine(m_InstanceName + "\n" +
-                                      "Total Threads: " + totalThreadCount +
+                                      "Added Threads: " + m_TotalThreads +
                                       "\nQueued Threads: " + m_ThreadQueue.Count +
                                       "\nActive Threads: " + m_ActiveThreads.Count +
+                                      "\nCompleted Threads: " + completedThreads +
                                       "\nDead Threads: " + m_DeadThreads.Count +
                                       "\nMax Threads: " + m_MaxThreads);
+                    m_TotalThreads = 0; // added threads
+                    completedThreads = 0;
 //#endif
                 }
                 else

@@ -1320,6 +1320,18 @@ namespace Utilities
             return status;
         }
 
+        public static void ConfigureUnhandledException()
+        {
+            AppDomain.CurrentDomain.UnhandledException += LogUnhandledException;
+        }
+
+        private static void LogUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = (Exception)e.ExceptionObject;
+            Utilities.Logger.log(ex.StackTrace, Utilities.MessageSeverity.ERROR, Utilities.MessageDestination.FILE);
+            //Environment.Exit(5);
+        }
+
         /// <summary>
         /// 
         /// </summary>
