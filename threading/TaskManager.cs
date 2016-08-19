@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Utilities.threading
 {
-    class TaskManager
+    public class TaskManager
     {
         static List<Task> Tasks = new List<Task>();
-        static int TotalTasks = 0;
+        static int AddedTasks = 0;
 
         public static void WaitAll()
         {
@@ -20,7 +20,7 @@ namespace Utilities.threading
 
         public static void AddTask(Task t)
         {
-            TotalTasks++;
+            AddedTasks++;
             lock(Tasks)
                 Tasks.Add(t);
         }
@@ -30,14 +30,15 @@ namespace Utilities.threading
             int completed = 0;
             int faulted = 0;
             DateTime lastUpdate = DateTime.Now;
-            while(!token.IsCancellationRequested)
+            DateTime timeout = DateTime.Now;
+            while (!token.IsCancellationRequested)
             {
                 int queued = 0;
                 int running = 0;
-                DateTime timeout = DateTime.Now;
+                timeout = DateTime.Now;
                 for(int i = 0;
                     i < Tasks.Count &&
-                    (DateTime.Now - timeout < TimeSpan.FromSeconds(10));
+                    (DateTime.Now - timeout < TimeSpan.FromMinutes(1));
                     i++)
                 {
                     if (Tasks[i] != null)
@@ -63,7 +64,7 @@ namespace Utilities.threading
                                 Tasks.RemoveAt(i);
                             i--;
                         }
-                        else
+                        else if(Tasks[i].Status == TaskStatus.RanToCompletion)
                         {
                             completed++;
                             lock(Tasks)
@@ -82,12 +83,13 @@ namespace Utilities.threading
 
                 if(DateTime.Now - lastUpdate > TimeSpan.FromSeconds(3))
                 {
-                    Console.WriteLine("Added:     " + TotalTasks);
+                    Console.WriteLine("Added:     " + AddedTasks);
                     Console.WriteLine("Queued:    " + queued);
                     Console.WriteLine("Running:   " + running);
                     Console.WriteLine("Completed: " + completed);
                     Console.WriteLine("Faulted:   " + faulted);
-                    TotalTasks = 0;
+                    Console.WriteLine("Total:     " + Tasks.Count);
+                    AddedTasks = 0;
                     completed = 0;
                     faulted = 0;
                     lastUpdate = DateTime.Now;

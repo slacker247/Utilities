@@ -225,7 +225,10 @@ namespace Utilities.system
                         result = "Executing Command...";
                     while (g_Proc != null && !g_Proc.HasExited && !g_Async)
                         Thread.Sleep(120);
-                    result = "Finished.";
+                    if (!g_Async)
+                        result = "Finished.";
+                    else
+                        result = "Running...";
                 }
                 catch (Win32Exception e)
                 {
