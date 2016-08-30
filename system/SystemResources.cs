@@ -10,22 +10,28 @@ namespace Utilities.system
     public class SystemResources
     {
         //int totalHits = 0;
+        static PerformanceCounter cpuCounter = new PerformanceCounter();
+        static bool m_Init = false;
+        protected static void init()
+        {
+            if (!m_Init)
+            {
+                cpuCounter.CategoryName = "Processor";
+                cpuCounter.CounterName = "% Processor Time";
+                cpuCounter.InstanceName = "_Total";
+                m_Init = true;
+            }
+        }
 
         public static float getCPUCounter()
         {
+            init();
 
-            PerformanceCounter cpuCounter = new PerformanceCounter();
-            cpuCounter.CategoryName = "Processor";
-            cpuCounter.CounterName = "% Processor Time";
-            cpuCounter.InstanceName = "_Total";
-
-            // will always start at 0
-            System.Threading.Thread.Sleep(300);
             // now matches task manager reading
-            //float secondValue = cpuCounter.NextValue();
+            float secondValue = cpuCounter.NextValue();
 
-//			return secondValue;
-			return 1;
+			return secondValue;
+//			return 1;
 		}
 
 		//public static string getAvailableRAM()

@@ -21,7 +21,7 @@ namespace Utilities.threading
         protected Thread m_Thread;
         protected System.Threading.ThreadState m_ThreadState;
         protected bool m_Stop = false;
-
+        
         protected Action m_SimpleMethod;
         protected Action<object> m_ParamMethod;
         public object Params{get;set;}
@@ -72,6 +72,16 @@ namespace Utilities.threading
 			m_SeedThread = false;
 		}
 
+        public int ThreadId
+        {
+            get
+            {
+                int retVal = -1;
+                if(m_Thread != null)
+                    retVal = m_Thread.ManagedThreadId;
+                return retVal;
+            }
+        }
         public String Name
         {
             get
@@ -98,6 +108,8 @@ namespace Utilities.threading
 
         public void Start()
         {
+            if(String.IsNullOrEmpty(this.m_Thread.Name))
+                this.m_Thread.Name = m_ThreadIdName;
             if (m_SimpleMethod != null)
                 this.m_Thread.Start();
             else if (m_ParamMethod != null)
@@ -141,7 +153,7 @@ namespace Utilities.threading
             m_SimpleMethod();
             ThreadState = System.Threading.ThreadState.Stopped;
             if (threadCallback != null)
-                threadCallback(Name);
+                threadCallback(ThreadId.ToString());
         }
 
         protected virtual void doWorkP(object parms)
@@ -150,7 +162,7 @@ namespace Utilities.threading
             m_ParamMethod(parms);
             ThreadState = System.Threading.ThreadState.Stopped;
             if (threadCallback != null)
-                threadCallback(Name);
+                threadCallback(ThreadId.ToString());
         }
 
         public void setThread(Thread th)
@@ -198,7 +210,10 @@ namespace Utilities.threading
             {
                 thread.SetApartmentState(ApartmentState.STA);
 
-                thread.Name = this.GetType().ToString() + "-" + thread.ManagedThreadId;
+                String name = m_ThreadIdName;
+                if (String.IsNullOrEmpty(name))
+                    name = this.GetType().ToString();
+                thread.Name = name + "-" + thread.ManagedThreadId;
                 if (String.IsNullOrEmpty(worker.m_ThreadIdName))
                     worker.m_ThreadIdName = thread.Name;
                 else

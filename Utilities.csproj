@@ -399,6 +399,7 @@
     <Compile Include="system\Execute.cs" />
     <Compile Include="system\SystemResources.cs" />
     <Compile Include="threading\BaseWorker.cs" />
+    <Compile Include="threading\NamedTask.cs" />
     <Compile Include="threading\TaskManager.cs" />
     <Compile Include="threading\ThreadManager.cs" />
     <Compile Include="threading\Threads.cs" />

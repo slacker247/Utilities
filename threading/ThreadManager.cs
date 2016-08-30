@@ -69,6 +69,20 @@ namespace Utilities.threading
 		}
 		#endregion
 
+        public void waitAll()
+        {
+            bool waiting = true;
+            while(waiting)
+            {
+                if(m_ActiveThreads.Count == 0 &&
+                    m_ThreadQueue.Count == 0)
+                {
+                    waiting = false;
+                }
+                Thread.Sleep(2000);
+            }
+        }
+
         public int getActiveThreads()
         {
             return m_ActiveThreads.Count;
@@ -77,6 +91,14 @@ namespace Utilities.threading
         public int getQueuedThreads()
         {
             return m_ThreadQueue.Count;
+        }
+
+        public void start()
+        {
+            BaseWorker th = new BaseWorker(runThreadsLoop);
+            th.Name = "Main Thread Loop";
+            th.createThread(ref th);
+            th.Start();
         }
 
         public void stop()
@@ -111,30 +133,35 @@ namespace Utilities.threading
 			m_TotalThreads += count;
 		}
 
-		/// <summary>
-		/// This function serves as the master run thread loop.
-		/// </summary>
-		public void runThreadsLoop()
-		{
-            int count = 0;
-            bool oneTime = true;
-            DateTime idleTime = DateTime.Now;
+        // Pause all requested cancel threads
+        protected void setCancelledThreads()
+        {
             while (m_Run)
-			{
-                int completedThreads = 0;
-                // Pause all requested cancel threads
-                for (int i = 0; i < m_CancelThreads.Keys.Count; i++ )
+            {
+                DateTime start = DateTime.Now;
+                for (int i = 0;
+                    i < m_CancelThreads.Keys.Count &&
+                    DateTime.Now - start < TimeSpan.FromSeconds(2);
+                    i++)
                 {
                     long uid = m_CancelThreads.Keys.ElementAt<long>(i);
                     long hid = m_CancelThreads[uid];
-                    foreach(BaseWorker th in m_ActiveThreads.Values)
+                    for (int b = 0;
+                        b < m_ActiveThreads.Count &&
+                        DateTime.Now - start < TimeSpan.FromSeconds(2);
+                        b++)
                     {
+                        String key = m_ActiveThreads.Keys.ElementAt<String>(b);
+                        BaseWorker th = m_ActiveThreads[key];
                         if (false)
                         {
                             th.Stop();
                         }
                     }
-                    for (int n = 0; n < m_ThreadQueue.Count; n++ )
+                    for (int n = 0;
+                        n < m_ThreadQueue.Count &&
+                        DateTime.Now - start < TimeSpan.FromSeconds(2);
+                        n++)
                     {
                         BaseWorker th = m_ThreadQueue[n];
                         if (false)
@@ -145,52 +172,68 @@ namespace Utilities.threading
                     }
                     m_CancelThreads.Remove(uid);
                 }
+                Thread.Sleep(120);
+            }
+        }
 
-                Process mainProc = System.Diagnostics.Process.GetCurrentProcess();
+        protected void setActiveThreads()
+        {
+            while (m_Run)
+            {
+                DateTime start = DateTime.Now;
+                //Process mainProc = System.Diagnostics.Process.GetCurrentProcess();
                 if ((m_ActiveThreads.Count() < m_MaxThreads) && (m_ThreadQueue.Count > 0)
-                   // && mainProc.PrivateMemorySize64 < 701001000L
-                   // && mainProc.HandleCount < 4000
+                    // && mainProc.PrivateMemorySize64 < 701001000L
+                    // && mainProc.HandleCount < 4000
                     )
-				{
+                {
                     lock (m_Lock)
                     {
-                        DateTime start = DateTime.Now;
-                        DateTime past = DateTime.Now;
-                        TimeSpan timeout = new TimeSpan(0, 0, 2);
-                        while(m_ActiveThreads.Count() < m_MaxThreads &&
+                        start = DateTime.Now;
+                        while (m_ActiveThreads.Count() < m_MaxThreads &&
                             m_ThreadQueue.Count() > 0 &&
-                            past - start < timeout)
+                            DateTime.Now - start < TimeSpan.FromSeconds(2))
                         {
                             //pop a thread and start, and increment active threads
                             BaseWorker popThread = m_ThreadQueue[0];
                             m_ThreadQueue.RemoveAt(0);
                             if (popThread != null &&
-                                !m_ActiveThreads.ContainsKey(popThread.Name))
+                                !m_ActiveThreads.ContainsKey(popThread.ThreadId.ToString()))
                             {
-                                m_ActiveThreads[popThread.Name] = popThread;
+                                m_ActiveThreads[popThread.ThreadId.ToString()] = popThread;
                                 if (popThread.ThreadState == System.Threading.ThreadState.Unstarted)
                                 {
                                     popThread.Start();
                                 }
                             }
-                            past = DateTime.Now;
                         }
                     }
-				}
+                }
+                Thread.Sleep(120);
+            }
+        }
 
-				float cpuUsage = Utilities.system.SystemResources.getCPUCounter();
-				if (cpuUsage < 80f)
-				{
+        protected void setMaxThreads()
+        {
+            bool oneTime = true;
+            DateTime idleTime = DateTime.Now;
+
+
+            while (m_Run)
+            {
+                float cpuUsage = Utilities.system.SystemResources.getCPUCounter();
+                if (cpuUsage < 80f)
+                {
                     if (m_MaxThreads < MaxThreads)
-						m_MaxThreads++;
-				}
-				else
-					m_MaxThreads = Environment.ProcessorCount + 1;
+                        m_MaxThreads++;
+                }
+                else
+                    m_MaxThreads = Environment.ProcessorCount + 1;
 
-				if (m_MaxThreads < Environment.ProcessorCount + 1)
-					m_MaxThreads = Environment.ProcessorCount + 1;
-                
-				int totalThreadCount = (m_ThreadQueue.Count + m_ActiveThreads.Count + m_DeadThreads.Count);
+                if (m_MaxThreads < Environment.ProcessorCount + 1)
+                    m_MaxThreads = Environment.ProcessorCount + 1;
+
+                int totalThreadCount = (m_ThreadQueue.Count + m_ActiveThreads.Count + m_DeadThreads.Count);
 
                 if (totalThreadCount == 0 && oneTime)
                 {
@@ -215,11 +258,44 @@ namespace Utilities.threading
                     //    m_Run = false;
                     //}
                 }
-                
-                count++;
-                if (count > 7 && (m_DeadThreads.Count > 0 || m_ActiveThreads.Count > 0))
+                Thread.Sleep(120);
+            }
+        }
+
+        /// <summary>
+        /// This function serves as the master run thread loop.
+        /// </summary>
+        public void runThreadsLoop()
+		{
+            DateTime printStatusTime = DateTime.Now;
+            int count = 0;
+            BaseWorker cancelTh = new BaseWorker(this.setCancelledThreads);
+            cancelTh.Name = "setCancelledThreads";
+            cancelTh.createThread(ref cancelTh);
+            cancelTh.Start();
+            BaseWorker activeTh = new BaseWorker(this.setActiveThreads);
+            activeTh.Name = "setActiveThreads";
+            activeTh.createThread(ref activeTh);
+            activeTh.Start();
+            BaseWorker maxTh = new BaseWorker(this.setMaxThreads);
+            maxTh.Name = "setMaxThreads";
+            maxTh.createThread(ref maxTh);
+            maxTh.Start();
+
+            // maybe create 3 threads to manage the arrays.
+            while (m_Run)
+			{
+                DateTime start = DateTime.Now;
+                int completedThreads = 0;
+
+                if (DateTime.Now - printStatusTime > TimeSpan.FromSeconds(5)
+                    && (m_DeadThreads.Count > 0 || m_ActiveThreads.Count > 0))
                 {
-                    for (int i = 0; i < m_DeadThreads.Count; i++)
+                    start = DateTime.Now;
+                    for (int i = 0;
+                        i < m_DeadThreads.Count &&
+                        DateTime.Now - start < TimeSpan.FromSeconds(2);
+                        i++)
                     {
                         if (m_DeadThreads[i] == null ||
                             m_DeadThreads[i].Join(150))
@@ -231,9 +307,8 @@ namespace Utilities.threading
                             completedThreads++;
                         }
                     }
-                    count = 0;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                    //GC.Collect();
+                    //GC.WaitForPendingFinalizers();
 //#if DEBUG
                     Console.WriteLine(m_InstanceName + "\n" +
                                       "Added Threads: " + m_TotalThreads +
@@ -245,6 +320,7 @@ namespace Utilities.threading
                     m_TotalThreads = 0; // added threads
                     completedThreads = 0;
 //#endif
+                    printStatusTime = DateTime.Now;
                 }
                 else
                 {
@@ -253,11 +329,31 @@ namespace Utilities.threading
                     //else
                     //    Thread.Sleep(300);
                 }
+                Thread.Sleep(120);
 			}
 
 			//update history to complete
 			Console.WriteLine("All threads complete, press any key to continue.");
 		}
+
+        public void addThread(Action<object> method, object parms, String name = "")
+        {
+            Utilities.threading.BaseWorker worker = new Utilities.threading.BaseWorker(method);
+            worker.Params = parms;
+            worker.Name = name;
+            worker.createThread(ref worker);
+            this.createQueueThread(worker);
+            Thread.Sleep(12);
+        }
+
+        public void addThread(Action method, String name = "")
+        {
+            Utilities.threading.BaseWorker worker = new Utilities.threading.BaseWorker(method);
+            worker.Name = name;
+            worker.createThread(ref worker);
+            this.createQueueThread(worker);
+            Thread.Sleep(12);
+        }
 
         /// <summary>
         /// This function will take in a worker instance object, a callback handle, and 

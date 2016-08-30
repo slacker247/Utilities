@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities.csproj", "{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilitiesTest", "UtilitiesTest\UtilitiesTest\UtilitiesTest.csproj", "{102EA164-A087-495E-86F9-39F62122C734}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,22 @@ Global
 		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test Remote|Any CPU.Build.0 = Website Test Remote|Any CPU
 		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test|Any CPU.ActiveCfg = Website Test|Any CPU
 		{0299B0DB-77E3-4FA4-99E3-D35EE6701B4C}.Website Test|Any CPU.Build.0 = Website Test|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Mgmt Release|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Mgmt Release|Any CPU.Build.0 = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Test Local|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Test Local|Any CPU.Build.0 = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Test Remote|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Test Remote|Any CPU.Build.0 = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.WebShowInfo Release|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.WebShowInfo Release|Any CPU.Build.0 = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Website Test Remote|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Website Test Remote|Any CPU.Build.0 = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Website Test|Any CPU.ActiveCfg = Release|Any CPU
+		{102EA164-A087-495E-86F9-39F62122C734}.Website Test|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

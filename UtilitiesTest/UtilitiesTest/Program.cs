@@ -10,21 +10,9 @@ namespace UtilitiesTest
     {
         static void Main(string[] args)
         {
-            /// "^Rs-3ByyHZm(+rK"
-	        string mid = "123412341234";
-	        string serial = "321432143214";
-	        string userName = "jeff@a.com";
+            TestThreading.test();
 
-	        string encryptText;
-
-	        Utilities.Crypto.setSalt(mid);
-	        encryptText = Utilities.Crypto.Encrypt(userName, serial);
-
-	        Console.WriteLine("Encrypted Text: {0}\n", encryptText);
-
-	        string uncryptText = Utilities.Crypto.Decrypt(encryptText, serial);
-
-            Console.WriteLine("Uncrypted Text: {0}\n", uncryptText);
+            Console.WriteLine("Finished.");
             Console.ReadKey();
         }
     }

@@ -59,6 +59,10 @@ namespace Utilities.db.mssql
                 }
                 catch (SqlException e)
                 {
+                    // The reason this doesn't get blocked with
+                    // the "too many connections" error is because
+                    // the count gets reset on every successful reconnect.
+                    // and this code is set to reconnect every time.
                     Console.WriteLine("Database1: Error: " + e.Message);
                     status = e.Message;
                 }
