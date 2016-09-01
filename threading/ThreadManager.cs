@@ -181,10 +181,7 @@ namespace Utilities.threading
             while (m_Run)
             {
                 DateTime start = DateTime.Now;
-                //Process mainProc = System.Diagnostics.Process.GetCurrentProcess();
                 if ((m_ActiveThreads.Count() < m_MaxThreads) && (m_ThreadQueue.Count > 0)
-                    // && mainProc.PrivateMemorySize64 < 701001000L
-                    // && mainProc.HandleCount < 4000
                     )
                 {
                     lock (m_Lock)
@@ -221,17 +218,21 @@ namespace Utilities.threading
 
             while (m_Run)
             {
-                float cpuUsage = Utilities.system.SystemResources.getCPUCounter();
-                if (cpuUsage < 80f)
+                if (m_MaxThreads < MaxThreads)
                 {
-                    if (m_MaxThreads < MaxThreads)
+                    float cpuUsage = Utilities.system.SystemResources.getCPUCounter();
+                    if (cpuUsage < 80f)
+                    {
                         m_MaxThreads++;
+                    }
+                    else
+                        m_MaxThreads = Environment.ProcessorCount + 1;
+
+                    if (m_MaxThreads < Environment.ProcessorCount + 1)
+                        m_MaxThreads = Environment.ProcessorCount + 1;
                 }
                 else
-                    m_MaxThreads = Environment.ProcessorCount + 1;
-
-                if (m_MaxThreads < Environment.ProcessorCount + 1)
-                    m_MaxThreads = Environment.ProcessorCount + 1;
+                    m_MaxThreads = MaxThreads;
 
                 int totalThreadCount = (m_ThreadQueue.Count + m_ActiveThreads.Count + m_DeadThreads.Count);
 
@@ -248,14 +249,30 @@ namespace Utilities.threading
                     oneTime = true;
                     idleTime = DateTime.Now;
                 }
-                else
+                Thread.Sleep(120);
+            }
+        }
+
+        protected void gcCleanup()
+        {
+            Process mainProc = System.Diagnostics.Process.GetCurrentProcess();
+            int reqMax = MaxThreads;
+            DateTime gcTime = DateTime.Now;
+            while (m_Run)
+            {
+                if (DateTime.Now - gcTime > TimeSpan.FromSeconds(3))
                 {
+                    //Console.WriteLine("GC");
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
-                    //if (DateTime.Now - idleTime > new TimeSpan(0, 2, 0) &&
-                    //   mainProc.HandleCount > 1000)
+                    gcTime = DateTime.Now;
+                    //if(mainProc.HandleCount > 10000)
                     //{
-                    //    m_Run = false;
+                    //    MaxThreads = 1;
+                    //}
+                    //else if(mainProc.HandleCount < 5000)
+                    //{
+                    //    MaxThreads = reqMax;
                     //}
                 }
                 Thread.Sleep(120);
@@ -281,6 +298,10 @@ namespace Utilities.threading
             maxTh.Name = "setMaxThreads";
             maxTh.createThread(ref maxTh);
             maxTh.Start();
+            BaseWorker gcTh = new BaseWorker(this.gcCleanup);
+            gcTh.Name = "gcCleanup";
+            gcTh.createThread(ref gcTh);
+            gcTh.Start();
 
             // maybe create 3 threads to manage the arrays.
             while (m_Run)
@@ -307,8 +328,6 @@ namespace Utilities.threading
                             completedThreads++;
                         }
                     }
-                    //GC.Collect();
-                    //GC.WaitForPendingFinalizers();
 //#if DEBUG
                     Console.WriteLine(m_InstanceName + "\n" +
                                       "Added Threads: " + m_TotalThreads +
@@ -316,7 +335,8 @@ namespace Utilities.threading
                                       "\nActive Threads: " + m_ActiveThreads.Count +
                                       "\nCompleted Threads: " + completedThreads +
                                       "\nDead Threads: " + m_DeadThreads.Count +
-                                      "\nMax Threads: " + m_MaxThreads);
+                                      "\nMax Threads: " + m_MaxThreads +
+                                      "\nRequested Threads: " + MaxThreads);
                     m_TotalThreads = 0; // added threads
                     completedThreads = 0;
 //#endif
