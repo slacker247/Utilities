@@ -153,7 +153,7 @@ namespace Utilities
 
                 // compare the supplied checksum against the real checksum for
                 // the key string.
-                int check = Convert.ToInt32(c, 16);
+                int check = System.Convert.ToInt32(c, 16);
                 int sum = SerialKey.PKV_GetChecksum(s.Substring(0, 20));
                 if(sum == check)
                     test = true;
@@ -205,14 +205,14 @@ namespace Utilities
                 String strSeed = "";
                 if(serial != null)
                     strSeed = serial.Substring(0, 8);
-                seed = Convert.ToInt64(strSeed, 16);
+                seed = System.Convert.ToInt64(strSeed, 16);
                 // verify parts of serial key
                 for (int i = 0; i < testBytes; i++)
                 {
                     String hex = "";
                     if(serial != null)
                         hex = serial.Substring(byteIndex[i], 2);
-                    byte b = Convert.ToByte(hex, 16);
+                    byte b = System.Convert.ToByte(hex, 16);
                     byte bA = SerialKey.PKV_GetKeyByte(seed,
                         SerialKey.m_ByteSeeds[i,0],
                         SerialKey.m_ByteSeeds[i,1],

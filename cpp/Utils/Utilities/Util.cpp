@@ -110,14 +110,14 @@ namespace utilities
 	/// <returns>returns: a boolean of true if the file exists
 	/// and false if the file does not.</returns>
 	/////////////////////////////////////////////////////////
-	bool Util::FileExists(string strFilename)
+	bool Util::FileExists(char* strFilename)
 	{
 		struct stat stFileInfo; 
 		bool blnReturn; 
 		int intStat; 
 
 		// Attempt to get the file attributes 
-		intStat = stat(strFilename.c_str(),&stFileInfo); 
+		intStat = stat(strFilename,&stFileInfo); 
 		if(intStat == 0)
 		{ 
 			// We were able to get the file attributes 

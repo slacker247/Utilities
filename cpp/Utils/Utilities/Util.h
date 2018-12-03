@@ -18,7 +18,7 @@ namespace utilities
 		Util(void);
 		~Util(void);
 		static int Tokenize(const string& str, vector<string>& tokens, const char delimiter);
-		static bool FileExists(string strFilename);
+		static bool FileExists(char* strFilename);
 		static int trimWhiteSpace(char* s);
 		static int split(char* str, char delim, vector<char*>* results);
 		static string replaceString(string str, string search, string replace);

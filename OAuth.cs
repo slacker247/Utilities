@@ -123,7 +123,7 @@ namespace Utilities
 
         private static string ToBase64(this byte[] input)
         {
-            return Convert.ToBase64String(input);
+            return System.Convert.ToBase64String(input);
         }
 
         private static string GetRandomString(int length)

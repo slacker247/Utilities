@@ -11,20 +11,21 @@ namespace Utilities.system
 {
     public class Execute
     {
-        public static bool g_Async = false;
-        public static bool g_CreateNoWindow = true;
-        protected static System.Diagnostics.Process g_Proc = null;
+        protected int g_ExitCode = -1;
+        public bool g_Async = false;
+        public bool g_CreateNoWindow = true;
+        protected System.Diagnostics.Process g_Proc = null;
 
         public delegate void ReceivedDataCallback(String data);
-        public static event ReceivedDataCallback receivedDataEvent;
+        public event ReceivedDataCallback receivedDataEvent;
 
-        private static void receivedData(object sendingProcess, DataReceivedEventArgs outLine)
+        private void receivedData(object sendingProcess, DataReceivedEventArgs outLine)
         {
             if (sendingProcess is Process)
                 receivedData((Process)sendingProcess, outLine.Data);
         }
 
-        protected static void receivedData(Process proc, String data)
+        protected void receivedData(Process proc, String data)
         {
             //System.Console.WriteLine("Data received: " + data);
 
@@ -34,12 +35,26 @@ namespace Utilities.system
             }
         }
 
-        public static void writeData(String cmd, String args)
+        public void writeData(String cmd, String args)
         {
             writeData(cmd + " " + args);
         }
 
-        public static void writeData(String cmd)
+        public void writeDataAsync(String cmd, String args)
+        {
+            writeDataAsync(cmd + " " + args);
+        }
+
+        public void writeDataAsync(String cmd)
+        {
+            if (g_Proc != null &&
+                !g_Proc.HasExited)
+            {
+                g_Proc.StandardInput.WriteLine(cmd);
+            }
+        }
+
+        public void writeData(String cmd)
         {
             if(g_Proc != null &&
                 !g_Proc.HasExited)
@@ -125,46 +140,57 @@ namespace Utilities.system
         }
 
         public delegate void ExitedCallback(int exitCode);
-        public static event ExitedCallback exitedEvent;
+        public event ExitedCallback exitedEvent;
 
-        private static void exited(object sendingProcess, EventArgs args)
+        private void exited(object sendingProcess, EventArgs args)
         {
             Process proc = (Process)sendingProcess;
             if (proc != null && proc.HasExited)
             {
                 // This is for webcam, test webcam if changing.
-                receivedData(proc, proc.StandardOutput.ReadToEnd());
+                if(!g_Async)
+                    receivedData(proc, proc.StandardOutput.ReadToEnd());
                 Console.WriteLine("Exit time:    {0}\r\n" +
                     "Exit code:    {1}\r\nElapsed time: {2}", proc.ExitTime, proc.ExitCode, 3325);
                 if (exitedEvent != null)
                 {
+                    g_ExitCode = proc.ExitCode;
                     exitedEvent(proc.ExitCode);
                 }
                 g_Proc = null;
             }
         }
 
-        private static String g_UserName = "";
-        private static String g_Password = "";
-        private static String g_Domain = "";
-        public static void setCreds(String username, String password, String domain)
+        private String g_UserName = "";
+        private String g_Password = "";
+        private String g_Domain = "";
+        public void setCreds(String username, String password, String domain)
         {
             g_UserName = username;
             g_Password = password;
             g_Domain = domain;
         }
 
-        public static int terminate()
+        public void wait()
+        {
+            while(g_Proc != null)
+            {
+                Thread.Sleep(120);
+            }
+        }
+
+        public int terminate()
         {
             int status = -1;
             if(g_Proc != null)
             {
                 g_Proc.Kill();
             }
+            wait();
             return status;
         }
         
-        public static int runCmd(String cmd, String args = "", String workingDir = "")
+        public int runCmd(String cmd, String args = "", String workingDir = "")
         {
             int status = -1;
             {
@@ -229,6 +255,11 @@ namespace Utilities.system
                         result = "Finished.";
                     else
                         result = "Running...";
+                    if (g_Async)
+                    {
+                        g_Proc.BeginErrorReadLine();
+                        g_Proc.BeginOutputReadLine();
+                    }
                 }
                 catch (Win32Exception e)
                 {
@@ -250,9 +281,13 @@ namespace Utilities.system
                 }
                 try
                 {
-                    if (g_Proc.HasExited)
+                    if (g_Proc != null && g_Proc.HasExited)
                     {
                         status = g_Proc.ExitCode;
+                    }
+                    else
+                    {
+                        status = g_ExitCode;
                     }
                 }
                 catch (Exception ex)

@@ -25,6 +25,19 @@ namespace Utilities
 
     public class Logger
     {
+        public static void log(Exception ex,
+            MessageSeverity logLevel,
+            MessageDestination output = MessageDestination.CONSOLE)
+        {
+            log(ex.Message, logLevel, output);
+            log(ex.StackTrace, logLevel, output);
+            if (ex.InnerException != null)
+            {
+                log(ex.Message, logLevel, output);
+                log(ex.StackTrace, logLevel, output);
+            }
+        }
+
         public static void log(string message,
             MessageSeverity logLevel,
             MessageDestination output = MessageDestination.CONSOLE)

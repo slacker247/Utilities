@@ -44,7 +44,7 @@ namespace Utilities
             String strSeed = Hash.GetMd5Hash(unique);
             System.Console.WriteLine(strSeed);
             String firstSeed = strSeed.Substring(0, 8);
-            seed = Convert.ToInt64(firstSeed, 16);
+            seed = System.Convert.ToInt64(firstSeed, 16);
             result = PKV_MakeKey(seed);
             return result;
         }

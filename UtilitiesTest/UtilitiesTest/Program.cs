@@ -10,7 +10,7 @@ namespace UtilitiesTest
     {
         static void Main(string[] args)
         {
-            TestThreading.test();
+            TestConvert.test();
 
             Console.WriteLine("Finished.");
             Console.ReadKey();

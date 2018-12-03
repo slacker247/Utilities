@@ -12,6 +12,34 @@ namespace Utilities
     // http://stackoverflow.com/questions/202011/encrypt-decrypt-string-in-net/2791259#2791259
     public class Crypto
     {
+        public static String signSha512(String message, String key)
+        {
+            String sign = "";
+            Encoding encoding = Encoding.ASCII;
+            var keyByte = encoding.GetBytes(key);
+            using (var hmacsha = new HMACSHA512(keyByte))
+            {
+                hmacsha.ComputeHash(encoding.GetBytes(message));
+                sign = Convert.ToHexString(hmacsha.Hash);
+            }
+
+            return sign;
+        }
+
+        public static String signSha256(String message, String key)
+        {
+            String sign = "";
+            Encoding encoding = Encoding.ASCII;
+            var keyByte = encoding.GetBytes(key);
+            using (var hmacsha = new HMACSHA256(keyByte))
+            {
+                hmacsha.ComputeHash(encoding.GetBytes(message));
+                sign = Convert.ToHexString(hmacsha.Hash);
+            }
+
+            return sign;
+        }
+
         private static byte[] m_Salt = Encoding.ASCII.GetBytes("Ent3r your oWn S@lt v@lu# h#r3");
 
         public static void setSalt(String salt)
@@ -31,7 +59,7 @@ namespace Utilities
             }
             String encryptStr = "";
             if (encryptedBytes != null)
-                encryptStr = Convert.ToBase64String(encryptedBytes);
+                encryptStr = System.Convert.ToBase64String(encryptedBytes);
             return encryptStr;
         }
 
@@ -42,7 +70,7 @@ namespace Utilities
             byte[] descryptedBytes;
             using (ICryptoTransform decryptor = algorithm.CreateDecryptor(algorithm.Key, algorithm.IV))
             {
-                byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+                byte[] encryptedBytes = System.Convert.FromBase64String(encryptedText);
                 descryptedBytes = InMemoryCrypt(encryptedBytes, decryptor);
             }
             String decryptStr = "";

@@ -370,13 +370,13 @@ namespace Utilities
                             {
                                 String tdate = date.Substring(m.Index, m.Length);
                                 String[] split = tdate.Split(' ');
-                                int year = Convert.ToInt32(split[2]);
+                                int year = System.Convert.ToInt32(split[2]);
                                 int month = Utilities.Util.convertMonth(split[1]);
                                 if (month == -1)
                                     month = m_LastMonth;
                                 else
                                     m_LastMonth = month;
-                                int day = Convert.ToInt32(split[0]);
+                                int day = System.Convert.ToInt32(split[0]);
                                 DateTime dt = new DateTime(year,
                                     month,
                                     day);
