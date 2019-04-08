@@ -440,6 +440,25 @@ namespace Utilities
             }
             return status;
         }
+        
+        //return "IEnumerable<T>" if all you need to do is iterate over elements
+        public static IEnumerable<ConsoleKeyInfo> GetInput()
+        {
+            //use "var" if return type is obvious from context
+            //use "HashSet<T>" if you need a collection of unique items
+            var input = new HashSet<ConsoleKeyInfo>();
+            var keyCount = 0;
+            while (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true);
+                //use constants instead of magic numbers - MaxInputLength
+                if (++keyCount > 1) continue;
+                //no need to call "Contains", non-unique items will be dropped automatically
+                input.Add(key);
+            }
+            //no need to convert anything
+            return input;
+        }
 
         public static int convertMonth(String month)
         {

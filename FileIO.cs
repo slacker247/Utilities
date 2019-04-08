@@ -6,11 +6,13 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace Utilities
 {
     public class FileIO
     {
+        protected static Utilities.threading.ThreadManager Mgmr = new threading.ThreadManager();
         protected static List<String> m_Files = new List<String>();
 
         public static string CnvrtUnit(long source)
@@ -134,7 +136,12 @@ namespace Utilities
 
         public static List<String> getFiles(String dir)
         {
-            return getFiles(dir, "");
+            Mgmr.MaxThreads = 16;
+            Mgmr.start();
+            getFiles(dir, "");
+            Mgmr.waitAll();
+            Mgmr.stop();
+            return m_Files;
         }
 
         // filter splits multiple file extensions based on the '|'
@@ -151,7 +158,9 @@ namespace Utilities
                 //{
                 //    m_Files.Add(f);
                 //}
-                DirSearch(dir, subFilter[n]);
+                var t_dir = dir;
+                var t_filter = subFilter[n];
+                Mgmr.addThread(() => DirSearch(t_dir, t_filter));
             }
             return m_Files;
         }
@@ -165,15 +174,21 @@ namespace Utilities
                     files = Directory.GetFiles(sDir, filter);
                 else
                     files = Directory.GetFiles(sDir);
-                foreach (String f in files)
+                // this is probably pointless as parallel with the lock in it.
+                Parallel.ForEach(files, new ParallelOptions() { MaxDegreeOfParallelism = 20 }, (f) =>
                 {
-                    m_Files.Add(f);
+                    lock (m_Files)
+                    {
+                        m_Files.Add(f);
+                    }
                     if (fileFound != null)
-                        fileFound(f);
-                }
+                        Mgmr.addThread(() => fileFound(f));
+                });
                 foreach (String d in Directory.GetDirectories(sDir))
                 {
-                    DirSearch(d, filter);
+                    var t_dir = d;
+                    var t_filter = filter;
+                    Mgmr.addThread(() => DirSearch(t_dir, t_filter));
                 }
             }
             catch (System.Exception excpt)

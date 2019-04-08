@@ -19,6 +19,14 @@ namespace Utilities.system
         public delegate void ReceivedDataCallback(String data);
         public event ReceivedDataCallback receivedDataEvent;
 
+        public int GetPid()
+        {
+            int id = -1;
+            if (g_Proc != null)
+                id = g_Proc.Id;
+            return id;
+        }
+
         private void receivedData(object sendingProcess, DataReceivedEventArgs outLine)
         {
             if (sendingProcess is Process)
@@ -189,7 +197,7 @@ namespace Utilities.system
             wait();
             return status;
         }
-        
+
         public int runCmd(String cmd, String args = "", String workingDir = "")
         {
             int status = -1;
