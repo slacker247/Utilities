@@ -62,6 +62,8 @@ namespace Utilities
                     result = System.Convert.ChangeType(value.ToString(), t);
                 if (t == typeof(int))
                     result = System.Convert.ChangeType(ToInt(value), t);
+                if (t == typeof(decimal))
+                    result = System.Convert.ChangeType(ToDecimal(value), t);
                 if (t == typeof(float))
                     result = System.Convert.ChangeType(ToFloat(value), t);
                 if (t == typeof(double))
@@ -91,7 +93,18 @@ namespace Utilities
                 result = (DateTime)value;
             else if (value is String)
             {
-                DateTime.TryParse((String)value, out result);
+                if (!DateTime.TryParse((String)value, out result))
+                {
+                    String str = value as string;
+                    try
+                    {
+                        result = DateTime.ParseExact(str, "yyyy-MM-dd h-tt", CultureInfo.InvariantCulture);
+                    }
+                    catch(Exception ex)
+                    {
+
+                    }
+                }
             }
             return result;
         }
@@ -109,9 +122,10 @@ namespace Utilities
                     result = ((double)val == 0 ? false : true);
                 }
             }
-            else if (Util.isNumber(value))
+            else if (Util.isNumber(value) ||
+                value is SByte)
             {
-                result = ((double)value == 0 ? false : true);
+                result = (System.Convert.ToDouble(value) == 0 ? false : true);
             }
             return result;
         }
@@ -152,6 +166,28 @@ namespace Utilities
             return result;
         }
 
+        public static decimal ToDecimal(Object value)
+        {
+            decimal result = 0;
+            if (value is decimal)
+                result = (decimal)value;
+            else if (value is String)
+            {
+                decimal dec = 0;
+                var d = Decimal.TryParse((String)value,
+                    System.Globalization.NumberStyles.Currency &
+                    NumberStyles.Float,
+                    CultureInfo.CurrentCulture,
+                    out dec);
+                result = (decimal)dec;
+            }
+            else if (Util.isNumber(value))
+            {
+                result = (decimal)System.Convert.ToDouble(value);
+            }
+            return result;
+        }
+
         public static float ToFloat(Object value)
         {
             float result = 0;
@@ -161,8 +197,7 @@ namespace Utilities
             {
                 decimal dec = 0;
                 var d = Decimal.TryParse((String)value,
-                    System.Globalization.NumberStyles.Currency &
-                    NumberStyles.Float,
+                    System.Globalization.NumberStyles.Any,
                     CultureInfo.CurrentCulture,
                     out dec);
                 result = (float)dec;
@@ -173,6 +208,10 @@ namespace Utilities
                 if (float.IsNaN(result))
                     result = 0;
             }
+            if (float.IsInfinity(result))
+                result = 0;
+            if (float.IsNaN(result))
+                result = 0;
             return result;
         }
 
@@ -197,6 +236,10 @@ namespace Utilities
                 if (double.IsNaN(result))
                     result = 0;
             }
+            if (double.IsInfinity(result))
+                result = 0;
+            if (double.IsNaN(result))
+                result = 0;
             return result;
         }
 

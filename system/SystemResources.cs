@@ -13,18 +13,18 @@ namespace Utilities.system
 {
     public class SystemResources
     {
-        public static string GetLocalIPAddress()
+        public static List<string> GetLocalIPAddress()
         {
-            String ip = "UNK";
+            List<String> ips = new List<string>();
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var _ip in host.AddressList)
             {
                 if (_ip.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    ip = _ip.ToString();
+                    ips.Add(_ip.ToString());
                 }
             }
-            return ip;
+            return ips;
         }
 
         //int totalHits = 0;
@@ -85,18 +85,28 @@ namespace Utilities.system
 
         public static long getOSDriveTotalSize()
         {
-            long totalSize = 0;
             var systemDriveName = Environment.GetEnvironmentVariable("SystemDrive");
-            var systemDrive = new DriveInfo(systemDriveName);
+            return getDriveTotalSize(systemDriveName);
+        }
+
+        public static long getDriveTotalSize(String driveName)
+        {
+            long totalSize = 0;
+            var systemDrive = new DriveInfo(driveName);
             totalSize = systemDrive.TotalSize;
             return totalSize;
         }
 
         public static long getOSDriveFreeSpace()
         {
-            long totalSize = 0;
             var systemDriveName = Environment.GetEnvironmentVariable("SystemDrive");
-            var systemDrive = new DriveInfo(systemDriveName);
+            return getDriveFreeSpace(systemDriveName);
+        }
+
+        public static long getDriveFreeSpace(String driveName)
+        {
+            long totalSize = 0;
+            var systemDrive = new DriveInfo(driveName);
             totalSize = systemDrive.TotalFreeSpace;
             return totalSize;
         }

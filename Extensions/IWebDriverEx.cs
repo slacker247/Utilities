@@ -10,6 +10,12 @@ namespace Utilities.Extensions
 {
     public class IWebDriverEx
     {
+        public static object javascript(IWebDriver driver, String js)
+        {
+            var result = ((IJavaScriptExecutor)driver).ExecuteScript(js);
+            return result;
+        }
+
         public static void innerHtml(IWebDriver driver, IWebElement elm, String html)
         {
             ((IJavaScriptExecutor)driver).ExecuteScript(
@@ -34,16 +40,35 @@ namespace Utilities.Extensions
             }
         }
 
+        public static void NavigateBack(IWebDriver driver)
+        {
+            try
+            {
+                ((IJavaScriptExecutor)driver).ExecuteScript("window.history.go(-1);");
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         public static void ScrollElementIntoView(IWebDriver driver, IWebElement elm)
         {
-            ((IJavaScriptExecutor)driver).ExecuteScript("" +
-                "Element.prototype.documentOffsetTop = function () {" +
-                "return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);" +
-                "};" +
-                "var top = arguments[0].documentOffsetTop() - (window.innerHeight/2);" +
-                "window.scrollTo(0, top);" +
-                "var top = arguments[0].documentOffset() - (window.innerHeight/2);" +
-                "", elm);
+            try
+            {
+                ((IJavaScriptExecutor)driver).ExecuteScript("" +
+                    "Element.prototype.documentOffsetTop = function () {" +
+                    "return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);" +
+                    "};" +
+                    "var top = arguments[0].documentOffsetTop() - (window.innerHeight/2);" +
+                    "window.scrollTo(0, top);" +
+                    "var top = arguments[0].documentOffset() - (window.innerHeight/2);" +
+                    "", elm);
+            }
+            catch(Exception ex)
+            {
+
+            }
             Thread.Sleep(1000);
         }
 
@@ -98,7 +123,7 @@ namespace Utilities.Extensions
             return elm;
         }
 
-        protected static ReadOnlyCollection<IWebElement> findElements(IWebDriver driver, By b)
+        public static ReadOnlyCollection<IWebElement> findElements(IWebDriver driver, By b)
         {
             ReadOnlyCollection<IWebElement> elms = null;
             DateTime start = DateTime.Now;

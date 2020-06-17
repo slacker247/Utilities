@@ -328,7 +328,7 @@ namespace Utilities.threading
                             completedThreads++;
                         }
                     }
-//#if DEBUG
+#if DEBUG
                     Console.WriteLine(m_InstanceName + "\n" +
                                       "Added Threads: " + m_TotalThreads +
                                       "\nQueued Threads: " + m_ThreadQueue.Count +
@@ -339,7 +339,7 @@ namespace Utilities.threading
                                       "\nRequested Threads: " + MaxThreads);
                     m_TotalThreads = 0; // added threads
                     completedThreads = 0;
-//#endif
+#endif
                     printStatusTime = DateTime.Now;
                 }
                 else

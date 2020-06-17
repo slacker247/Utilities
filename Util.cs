@@ -405,7 +405,8 @@ namespace Utilities
                 num is short ||
                 num is ushort ||
                 num is long ||
-                num is ulong)
+                num is ulong ||
+                num is decimal)
             {
                 test = true;
             }
