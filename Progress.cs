@@ -18,6 +18,12 @@ namespace Utilities
             Console.Write("\n0");
         }
 
+        public Progress(String msg, int cnt)
+        {
+            Count = cnt;
+            Console.Write(msg + "\n0");
+        }
+
         public void Next()
         {
             Current++;

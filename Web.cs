@@ -9,6 +9,13 @@ namespace Utilities
 {
     public class Web
     {
+        public static String getJsonStr(String url)
+        {
+            WebClient wc = new WebClient();
+            String jStr = wc.DownloadString(url);
+            return jStr;
+        }
+
         public static JObject getJson(String url)
         {
             JObject json = null;

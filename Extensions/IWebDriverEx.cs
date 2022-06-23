@@ -10,6 +10,13 @@ namespace Utilities.Extensions
 {
     public class IWebDriverEx
     {
+        public static void setValue(IWebDriver driver, By b, string value)
+        {
+            var elm = driver.FindElement(b);
+            Utilities.Extensions.IWebDriverEx.ScrollElementIntoView(driver, elm);
+            elm.Click();
+            elm.SendKeys(value);
+        }
         public static object javascript(IWebDriver driver, String js)
         {
             var result = ((IJavaScriptExecutor)driver).ExecuteScript(js);
@@ -24,6 +31,7 @@ namespace Utilities.Extensions
 
         public static void waitVisible(IWebElement elm, int iTimeout = 15)
         {
+            // WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "waitCreate")))
             DateTime start = DateTime.Now;
             TimeSpan timeout = TimeSpan.FromSeconds(iTimeout);
             bool visibile = false;
@@ -80,12 +88,17 @@ namespace Utilities.Extensions
         public static void ClickElement(IWebDriver driver, By b)
         {
             IWebElement elm = findElement(driver, b);
+            ClickElement(driver, elm);
+        }
+        public static void ClickElement(IWebDriver driver, IWebElement elm)
+        {
             if (elm != null)
             {
                 ScrollElementIntoView(driver, elm);
                 elm.Click();
             }
         }
+
         public static void clickLink(IWebDriver driver, String href)
         {
             var link = IWebDriverEx.findElement(driver, By.XPath("//a[@href='" + href + "']"));

@@ -8,14 +8,8 @@ namespace Utilities
 {
     public class Hash
     {
-        public static string GetMd5Hash(string input, MD5 md5Hash = null)
+        protected static String bytes2String(byte[] data)
         {
-            if (md5Hash == null)
-                md5Hash = MD5.Create();
-
-            // Convert the input string to a byte array and compute the hash. 
-            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
-
             // Create a new Stringbuilder to collect the bytes 
             // and create a string.
             StringBuilder sBuilder = new StringBuilder();
@@ -26,9 +20,30 @@ namespace Utilities
             {
                 sBuilder.Append(data[i].ToString("x2"));
             }
+            return sBuilder.ToString();
+        }
+
+        public static string GetSha512(String input)
+        {
+            var hash = "";
+            var data = Encoding.UTF8.GetBytes(input);
+            using (SHA512 shaM = new SHA512Managed())
+            {
+                hash = bytes2String(shaM.ComputeHash(data));
+            }
+            return hash;
+        }
+
+        public static string GetMd5Hash(string input, MD5 md5Hash = null)
+        {
+            if (md5Hash == null)
+                md5Hash = MD5.Create();
+
+            // Convert the input string to a byte array and compute the hash. 
+            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
 
             // Return the hexadecimal string. 
-            return sBuilder.ToString();
+            return bytes2String(data);
         }
 
         // Verify a hash against a string. 

@@ -228,7 +228,7 @@ namespace Utilities.system
                 }
                 
                 if(receivedDataEvent != null || 
-                    exitedEvent != null)
+                    exitedEvent != null || g_Async)
                 {
                     // The following commands are needed to redirect the standard output.
                     // This means that it will be redirected to the Process.StandardOutput StreamReader.
