@@ -7,6 +7,11 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Collections;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Drawing;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Utilities
 {
@@ -118,6 +123,33 @@ namespace Utilities
             return hashed;
         }
 
+        public static String humanReadableSize(long size)
+        {
+            string[] suffixes = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+            int s = 0;
+            double len = size;
+
+            while (len >= 1024 && s < suffixes.Length - 1)
+            {
+                s++;
+                len = len / 1024;
+            }
+
+            string result = String.Format("{0:0.##} {1}", len, suffixes[s]);
+            return result;
+        }
+
+        [SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage"), SuppressUnmanagedCodeSecurity]
+        [DllImport("Kernel32", SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetDiskFreeSpaceEx
+        (
+            string lpszPath,                    // Must name a folder, must end with '\'.
+            ref long lpFreeBytesAvailable,
+            ref long lpTotalNumberOfBytes,
+            ref long lpTotalNumberOfFreeBytes
+        );
+        
         // Does not work with unc paths
         public static long getTotalFreeSpace(string driveName)
         {

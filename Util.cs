@@ -417,7 +417,7 @@ namespace Utilities
         {
             double retVal = 0;
             if (isNumber(num))
-                retVal = (double)num;
+                retVal = Convert.ToDouble(num);
             else if (num is String)
                 double.TryParse((String)num, out retVal);
             return retVal;

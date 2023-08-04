@@ -15,6 +15,8 @@ namespace Utilities.Extensions
             var elm = driver.FindElement(b);
             Utilities.Extensions.IWebDriverEx.ScrollElementIntoView(driver, elm);
             elm.Click();
+            elm.SendKeys(Keys.Control + "a");
+            elm.SendKeys(Keys.Delete);
             elm.SendKeys(value);
         }
         public static object javascript(IWebDriver driver, String js)
@@ -65,13 +67,13 @@ namespace Utilities.Extensions
             try
             {
                 ((IJavaScriptExecutor)driver).ExecuteScript("" +
-                    "Element.prototype.documentOffsetTop = function () {" +
-                    "return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);" +
-                    "};" +
-                    "var top = arguments[0].documentOffsetTop() - (window.innerHeight/2);" +
-                    "window.scrollTo(0, top);" +
-                    "var top = arguments[0].documentOffset() - (window.innerHeight/2);" +
-                    "", elm);
+                    //"Element.prototype.documentOffsetTop = function () {" +
+                    //"return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);" +
+                    //"};" +
+                    //"var top = arguments[0].documentOffsetTop() - (window.innerHeight/2);" +
+                    //"window.scrollTo(0, top);" +
+                    //"var top = arguments[0].documentOffset() - (window.innerHeight/2);" +
+                    "arguments[0].scrollIntoView(true);", elm);
             }
             catch(Exception ex)
             {
